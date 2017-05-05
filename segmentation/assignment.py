@@ -1,8 +1,9 @@
 import cv2
-import numpy as np
-from scipy.spatial.distance import cdist
 import sys
+import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from scipy.spatial.distance import cdist
 
 def findpeak(data, idx, r):
 
@@ -41,6 +42,7 @@ def meanshift(data, r):
 	peaks = []
 	labels = np.zeros(data.shape[1]) - 1
 	for i in range(data.shape[1]):
+		print("Processing pixel {}".format(i))
 		peak = findpeak(data, i, r)
 
 		merged = False
@@ -74,16 +76,16 @@ def findpeak_opt(data, idx, r):
 	while shift > t:		
 
 		# Compute distance to all points
-		distances = cdist(point, data.transpose())
+		distances = cdist(point, data.transpose())[0]
 
 		# Determine points in window
 		close_points = []
 
-		for i, dist in enumerate(distances[0]):
+		for i, dist in enumerate(distances):
 			if dist <= r:
 				close_points.append(data[:, i])
-			if dist <= r/c:
-				cpts.append(data[:, i])
+			if 0 < dist <= r/c:
+				cpts.append(i)
 
 		close_points = np.array(close_points)
 
@@ -102,19 +104,27 @@ def meanshift_opt(data, r):
 	labels = np.zeros(data.shape[1]) - 1
 	for i in range(data.shape[1]):
 		if labels[i] != -1:
+			print("Pixel {} skipped".format(i))
 			continue
+
+		print("Processing pixel {}".format(i))
 
 		peak, cpts = findpeak_opt(data, i, r)
 
 		merged = False
 
 		if len(peaks) > 0:
-			distances = cdist(peak, np.array(peaks).reshape(len(peaks), peak.size))
-			for k, dist in enumerate(distances[0]):
+			distances = cdist(peak, np.array(peaks).reshape(len(peaks), peak.size))[0]
+			for k, dist in enumerate(distances):
 				if dist < r/2.0:
 					# Merge peaks
 					merged = True
 					labels[i] = k
+					labels[cpts] = k
+
+					neighbor_dist = cdist(peak, data.transpose())[0]
+					indices = np.where(neighbor_dist <= r)[0]
+					labels[indices] = k
 					break
 
 		if not merged:
@@ -122,10 +132,10 @@ def meanshift_opt(data, r):
 			labels[i] = len(peaks) - 1
 
 			# Basin of Attraction
-			neighbor_dist = cdist(peak, data.transpose())
-			for k, dist in enumerate(neighbor_dist[0]):
-				if dist <= r:
-					labels[k] = labels[i]
+			neighbor_dist = cdist(peak, data.transpose())[0]
+			indices = np.where(neighbor_dist <= r)[0]
+			labels[indices] = labels[i]
+			labels[cpts] = labels[i]
 
 	return labels, np.array(peaks).reshape(len(peaks), peak.size)
 
@@ -133,14 +143,20 @@ def plotclusters(data, labels, means):
 	pass
 
 def imSegment(im, r):
-	pass
 	# Blur image
-	#im = cv2.GaussianBlur(im, (5,5), 5.0)
+	im = cv2.GaussianBlur(im, (5,5), 5.0)
 
 	# Convert rgb to lab
-	#im = cv2.cvtColor(im, cv2.COLOR_BGR2LAB)
+	im = cv2.cvtColor(im, cv2.COLOR_BGR2LAB)
 
-	#labels, peaks = meanshift_opt(data, r)
+	im = im.reshape(im.shape[0]*im.shape[1], im.shape[2])
+
+	data = im.transpose()
+
+	labels, peaks = meanshift_opt(data, r)
+
+	return labels, peaks
 
 if __name__ == "__main__":
-	pass
+	im = cv2.imread("woman.jpg")
+	labels, peaks = imSegment(im, 2.0)
