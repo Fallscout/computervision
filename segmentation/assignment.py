@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial.distance import cdist
+from progress.bar import Bar
 
 def findpeak(data, idx, r):
 
@@ -101,13 +102,12 @@ def findpeak_opt(data, idx, r):
 
 def meanshift_opt(data, r):
 	peaks = []
-	labels = np.zeros(data.shape[1]) - 1
+	labels = np.zeros(data.shape[1], dtype=int) - 1
+	bar = Bar("Progress", max=data.shape[1])
 	for i in range(data.shape[1]):
+		bar.next()
 		if labels[i] != -1:
-			print("Pixel {} skipped".format(i))
 			continue
-
-		print("Processing pixel {}".format(i))
 
 		peak, cpts = findpeak_opt(data, i, r)
 
@@ -136,13 +136,16 @@ def meanshift_opt(data, r):
 			indices = np.where(neighbor_dist <= r)[0]
 			labels[indices] = labels[i]
 			labels[cpts] = labels[i]
+	bar.finish()
 
-	return labels, np.array(peaks).reshape(len(peaks), peak.size)
+	return labels, np.array(peaks, dtype=np.uint8).reshape(len(peaks), peak.size)
 
 def plotclusters(data, labels, means):
 	pass
 
 def imSegment(im, r):
+	orig_img = np.array(im)
+
 	# Blur image
 	im = cv2.GaussianBlur(im, (5,5), 5.0)
 
@@ -155,8 +158,15 @@ def imSegment(im, r):
 
 	labels, peaks = meanshift_opt(data, r)
 
-	return labels, peaks
+	peaks = np.array([peaks])
+	peaks = cv2.cvtColor(peaks, cv2.COLOR_LAB2BGR)[0]
+
+	im = peaks[labels]
+	im = im.reshape(orig_img.shape[0], orig_img.shape[1], orig_img.shape[2])
+
+	return im, labels, peaks
 
 if __name__ == "__main__":
 	im = cv2.imread("woman.jpg")
-	labels, peaks = imSegment(im, 2.0)
+	#im = cv2.resize(im, (0,0), fx=0.4, fy=0.4)
+	segIm, labels, peaks = imSegment(im, 15.0)
