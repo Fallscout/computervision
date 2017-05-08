@@ -1,7 +1,9 @@
+#!/usr/bin/env python3
 import logging
 import cv2
-import sys
+import argparse
 import datetime
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -11,7 +13,7 @@ from progress.bar import Bar
 def findpeak(data, idx, r):
 
 	t = 0.01
-	shift = sys.maxint
+	shift = 1
 
 	# Get point of interest
 	point = data[:, idx]
@@ -64,7 +66,7 @@ def meanshift(data, r):
 def findpeak_opt(data, idx, r, c):
 
 	t = 0.01
-	shift = sys.maxint
+	shift = 1
 	cpts = np.zeros(data.shape[1])
 
 	# Get point of interest
@@ -168,27 +170,35 @@ def imSegment(im, r, c=4.0, use_spatial_features=False):
 	return im, labels, peaks
 
 if __name__ == "__main__":
-	logging.basicConfig(filename="logging.log", level=logging.INFO, filemode="w")
+	parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	parser.add_argument("img_file", type=str, help="image to process")
+	parser.add_argument("--output_dir", type=str, default="output", help="directory to write output to")
+	parser.add_argument("--logfile_name", type=str, default="log.txt", help="name of the log file")
+	args = parser.parse_args()
+
+	if not os.path.isdir(args.output_dir):
+		os.makedirs(args.output_dir)
+
+	logging.basicConfig(filename=os.path.join(args.output_dir, args.logfile_name), level=logging.INFO, filemode="w")
 	logger = logging.getLogger(__name__)
 	logger.addHandler(logging.StreamHandler())
 
-	pics = ["pic1", "pic2", "pic3"]
 	rs = [4, 8, 16, 32]
 	cs = [4, 8, 16]
 	flags = [False, True]
-	for pic in pics:
-		im = cv2.imread(pic + ".jpg")
-		#im = cv2.resize(im, (0,0), fx=0.2, fy=0.2) # for debugging
-		for r in rs:
-			for c in cs:
-				for f in flags:
-					logger.info("Processing {} with r={}, c={}, using spatial features: {}".format(pic, r, c, f))
-					segIm, labels, peaks = imSegment(im=im, r=r, c=c, use_spatial_features=f)
 
-					peaks_file = "output_{}/peaks_r{}_c{}_{}.txt".format(pic, r, c, "3D" if f == False else "5D")
-					labels_file = "output_{}/labels_r{}_c{}_{}.txt".format(pic, r, c, "3D" if f == False else "5D")
-					img_file = "output_{}/img_r{}_c{}_{}.jpg".format(pic, r, c, "3D" if f == False else "5D")
-					
-					np.savetxt(peaks_file, peaks)
-					np.savetxt(labels_file, labels)
-					cv2.imwrite(img_file, segIm)
+	im = cv2.imread(args.img_file)
+	#im = cv2.resize(im, (0,0), fx=0.2, fy=0.2)
+	for r in rs:
+		for c in cs:
+			for f in flags:
+				logger.info("Processing {} with r={}, c={}, using spatial features: {}".format(args.img_file, r, c, f))
+				segIm, labels, peaks = imSegment(im=im, r=r, c=c, use_spatial_features=f)
+
+				peaks_filename = os.path.join(args.output_dir, "peaks_r{}_c{}_{}.txt".format(r, c, "3D" if f == False else "5D"))
+				labels_filename = os.path.join(args.output_dir, "labels_r{}_c{}_{}.txt".format(r, c, "3D" if f == False else "5D"))
+				img_filename = os.path.join(args.output_dir, "img_r{}_c{}_{}.jpg".format(r, c, "3D" if f == False else "5D"))
+				
+				np.savetxt(peaks_filename, peaks)
+				np.savetxt(labels_filename, labels)
+				cv2.imwrite(img_filename, segIm)
