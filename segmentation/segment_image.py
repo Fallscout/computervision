@@ -10,7 +10,19 @@ from mpl_toolkits.mplot3d import Axes3D
 from scipy import spatial
 from progress.bar import Bar
 
-def findpeak(data, idx, r, tree):
+def findpeak(data, idx, r, tree=None):
+	"""
+	Calculates the peak of the corresponding mode for the specified data point.
+
+	Args:
+		data: image data.
+		idx: index of data point for which to calculate the peak.
+		r: window size.
+		tree: cKDTree generated from data.
+
+	Returns:
+		The peak of the mode for the specified data point.
+	"""
 	t = 0.01
 	shift = 1
 
@@ -20,10 +32,13 @@ def findpeak(data, idx, r, tree):
 
 	while shift > t:		
 
-		# Compute distance to all points
-		close_points = tree.query_ball_point(point, r)[0]
-
 		# Determine points in window
+		if tree == None:
+			distances = spatial.distance.cdist(point, data)
+			close_points = np.where(distances <= r)[1]
+		else:
+			close_points = tree.query_ball_point(point, r)[0]
+
 		neighbors = data[close_points]
 
 		# Calculate new mean
@@ -36,13 +51,23 @@ def findpeak(data, idx, r, tree):
 
 	return point
 
-def meanshift(data, r, tree):
+def meanshift(data, r, tree=None):
+	"""
+	Applies mean shift to every data point in the array.
+
+	Args:
+		data: image data.
+		r: window size.
+		tree: cKDTree generated from data.
+
+	Returns:
+		A list of labels for the data point, that indicates which
+		peak each pixel of the image belongs to, and the list of peaks.
+	"""
 	peaks = []
 	labels = np.zeros(data.shape[0]) - 1
 	for i in range(data.shape[0]):
 		peak = findpeak(data, i, r, tree)
-
-		neighbor_in_range = tree.query_ball_point(peak, r)[0]
 
 		if len(peaks) == 0:
 			peaks.append(peak)
@@ -58,7 +83,22 @@ def meanshift(data, r, tree):
 
 	return labels, np.array(peaks).reshape(len(peaks), peak.size)
 
-def findpeak_opt(data, idx, r, c, tree):
+def findpeak_opt(data, idx, r, c, tree=None):
+	"""
+	Calculates the peak of the corresponding mode for the specified data point.
+	Also returns all points within a radius r/c of the search path.
+
+	Args:
+		data: image data.
+		idx: index of data point for which to calculate the peak.
+		r: window size.
+		c: denominator of search path window.
+		tree: cKDTree generated from data.
+
+	Returns:
+		The peak of the mode for the specified data point and a list
+		of indices of points close to the search path.
+	"""
 	t = 0.01
 	shift = 1
 	cpts = set()
@@ -69,12 +109,17 @@ def findpeak_opt(data, idx, r, c, tree):
 
 	while shift > t:		
 
-		# Compute distance to all points
-		close_points = tree.query_ball_point(point, r)[0]
-
 		# Determine points in window
+		if tree == None:
+			distances = spatial.distance.cdist(point, data)
+			close_points = np.where(distances <= r)[1]
+			cpts = cpts.union(np.where(distances <= r/c)[1])
+		else:
+			close_points = tree.query_ball_point(point, r)[0]
+			cpts = cpts.union(tree.query_ball_point(point, r/c)[0])
+
+		
 		neighbors = data[close_points]
-		cpts = cpts.union(tree.query_ball_point(point, r/c)[0])
 
 		# Calculate new mean
 		new_point = np.mean(neighbors, axis=0)
@@ -86,7 +131,20 @@ def findpeak_opt(data, idx, r, c, tree):
 
 	return point, list(cpts)
 
-def meanshift_opt(data, r, c, tree):
+def meanshift_opt(data, r, c, tree=None):
+	"""
+	Applies mean shift to every data point in the array.
+	Associates all points within the window r with the found peak.
+
+	Args:
+		data: image data.
+		r: window size.
+		tree: cKDTree generated from data.
+
+	Returns:
+		A list of labels for the data point, that indicates which
+		peak each pixel of the image belongs to, and the list of peaks.
+	"""
 	skipped = 0
 	peaks = []
 	labels = np.zeros(data.shape[0], dtype=int) - 1
@@ -98,7 +156,12 @@ def meanshift_opt(data, r, c, tree):
 			continue
 
 		peak, cpts = findpeak_opt(data, i, r, c, tree)
-		neighbors_in_range = tree.query_ball_point(peak, r)[0]
+
+		if tree == None:
+			distances = spatial.distance.cdist(peak, data)
+			neighbors_in_range = np.where(distances <= r)[1]
+		else:
+			neighbors_in_range = tree.query_ball_point(peak, r)[0]
 
 		if len(peaks) == 0:
 			peaks.append(peak)
@@ -120,7 +183,17 @@ def meanshift_opt(data, r, c, tree):
 
 	return labels, np.array(peaks).reshape(len(peaks), peak.size)
 
-def plotclusters(data, labels, peaks):
+def plotclusters2D(data, labels, peaks):
+	"""
+	Plots the modes of the given image data in 2D by coloring each pixel
+	according to its corresponding peak.
+
+	Args:
+		data: image data.
+		labels: a list of labels, one for each pixel.
+		peaks: a list of vectors, whose first three components can
+		be interpreted as BGR values.
+	"""
 	fig = plt.figure()
 	ax = fig.add_subplot(111)
 	bgr_peaks = np.array(peaks[:, 0:3])
@@ -132,6 +205,21 @@ def plotclusters(data, labels, peaks):
 	fig.show()
 
 def imSegment(im, r, c=4.0, use_spatial_features=False):
+	"""
+	Segments the given image with the mean shift algorithm.
+
+	Args:
+		im: the image to segment.
+		r: the window size for the mean shift algorithm.
+		c: denominator of search path window.
+		use_spatial_features: if True, include spatial image information
+		in the feature vectors. If False, only include LAB color values.
+
+	Returns:
+		The segmented image, where each pixel has been replaced with the color of
+		its corresponding peak, the list of labels for the pixels and the list
+		of peaks found by the mean shift algorithm.
+	"""
 	orig_img = np.array(im)
 
 	# Blur image
