@@ -6,7 +6,7 @@ import numpy as np
 OUTFILE = "statistics.json"
 
 def extract_from_log(save=False):
-    logs = ["output_pic2/log.txt"]
+    logs = ["output_pic1/log.txt", "output_pic2/log.txt", "output_pic3/log.txt"]
     objs = []
     for idx, log in enumerate(logs):
         with open(log, "r") as lf:
@@ -42,7 +42,7 @@ def plot_varying(param, objs):
     deviations = []
     if param == "r":
         plt.figure()
-        plt.xlabel("c")
+        plt.xlabel("r")
         plt.ylabel("Seconds")
         for c in cs:
             static_c = [x for x in objs if x["c"] == c]
@@ -61,7 +61,7 @@ def plot_varying(param, objs):
         #plt.show()
     elif param == "c":
         plt.figure()
-        plt.xlabel("r")
+        plt.xlabel("c")
         plt.ylabel("Seconds")
         for r in rs:
             static_r = [x for x in objs if x["r"] == r]
@@ -83,7 +83,7 @@ def plot_varying(param, objs):
 
 
 if __name__ == "__main__":
-    objs = extract_from_log()
+    objs = extract_from_log(True)
     plot_varying("r", objs)
     plot_varying("c", objs)
     plt.show()
