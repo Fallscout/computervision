@@ -1,3 +1,0 @@
-INFO:__main__:Processing pic1.jpg with r=32, c=4, using spatial features: False
-INFO:__main__:Skipped 99.92% of pixels
-INFO:__main__:Time elapsed: 84.626 seconds
