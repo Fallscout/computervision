@@ -286,8 +286,6 @@ if __name__ == "__main__":
 
 		segIm, labels, peaks = imSegment(im=im, r=args.r, c=args.c, use_spatial_features=args.use_spatial_features)
 	else:
-		savepoint = 9
-		counter = 0
 		rs = [4, 8, 16, 32]
 		cs = [4, 8, 16]
 		flags = [False, True]
@@ -295,9 +293,6 @@ if __name__ == "__main__":
 		for r in rs:
 			for c in cs:
 				for f in flags:
-					counter += 1
-					if counter <= savepoint:
-						continue
 					logger.info("Processing {} with r={}, c={}, using spatial features: {}".format(args.img_file, r, c, f))
 					segIm, labels, peaks = imSegment(im=im, r=r, c=c, use_spatial_features=f)
 
