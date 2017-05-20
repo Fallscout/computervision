@@ -9,13 +9,14 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy import spatial
 from progress.bar import Bar
+from tqdm import tqdm
 
 def findpeak(data, idx, r, tree=None):
 	"""
 	Calculates the peak of the corresponding mode for the specified data point.
 
 	Args:
-		data: image data.
+		data: image data in the format [number of pixels]x[feature vector].
 		idx: index of data point for which to calculate the peak.
 		r: window size.
 		tree: cKDTree generated from data.
@@ -42,7 +43,7 @@ def findpeak(data, idx, r, tree=None):
 		neighbors = data[close_points]
 
 		# Calculate new mean
-		new_point = np.mean(close_points, axis=1)
+		new_point = np.mean(neighbors, axis=0)
 		new_point = new_point.reshape(1, new_point.size)
 
 		#Calculate shift distance
@@ -56,7 +57,7 @@ def meanshift(data, r, tree=None):
 	Applies mean shift to every data point in the array.
 
 	Args:
-		data: image data.
+		data: image data in the format [number of pixels]x[feature vector].
 		r: window size.
 		tree: cKDTree generated from data.
 
@@ -65,7 +66,7 @@ def meanshift(data, r, tree=None):
 		peak each pixel of the image belongs to, and the list of peaks.
 	"""
 	peaks = []
-	labels = np.zeros(data.shape[0]) - 1
+	labels = np.zeros(data.shape[0], dtype=int) - 1
 	for i in range(data.shape[0]):
 		peak = findpeak(data, i, r, tree)
 
@@ -73,7 +74,7 @@ def meanshift(data, r, tree=None):
 			peaks.append(peak)
 			labels[i] = len(peaks) - 1
 		else:
-			distances = spatial.distance.cdist(peak, np.array(peaks).reshape(len(peaks), peak.size))[0]
+			distances = spatial.distance.cdist(peak, np.array(peaks))[0]
 			min_dist = np.min(distances)
 			if min_dist < r/2.0:
 				labels[i] = np.argmin(distances)
@@ -81,7 +82,7 @@ def meanshift(data, r, tree=None):
 				peaks.append(peak)
 				labels[i] = len(peaks) - 1
 
-	return labels, np.array(peaks).reshape(len(peaks), peak.size)
+	return labels, np.array(peaks)
 
 def findpeak_opt(data, idx, r, c, tree=None):
 	"""
@@ -89,7 +90,7 @@ def findpeak_opt(data, idx, r, c, tree=None):
 	Also returns all points within a radius r/c of the search path.
 
 	Args:
-		data: image data.
+		data: image data in the format [number of pixels]x[feature vector].
 		idx: index of data point for which to calculate the peak.
 		r: window size.
 		c: denominator of search path window.
@@ -101,35 +102,33 @@ def findpeak_opt(data, idx, r, c, tree=None):
 	"""
 	t = 0.01
 	shift = 1
-	cpts = set()
+	cpts = []
 
 	# Get point of interest
 	point = data[idx]
-	point = point.reshape(1, point.size)
 
 	while shift > t:		
 
 		# Determine points in window
 		if tree == None:
-			distances = spatial.distance.cdist(point, data)
+			distances = spatial.distance.cdist(np.array([point]), data)
 			close_points = np.where(distances <= r)[1]
-			cpts = cpts.union(np.where(distances <= r/c)[1])
+			cpts.extend(np.where(distances <= r/c)[1])
 		else:
-			close_points = tree.query_ball_point(point, r)[0]
-			cpts = cpts.union(tree.query_ball_point(point, r/c)[0])
+			close_points = tree.query_ball_point(point, r)
+			cpts.extend(tree.query_ball_point(point, r/c))
 
 		
 		neighbors = data[close_points]
 
 		# Calculate new mean
 		new_point = np.mean(neighbors, axis=0)
-		new_point = new_point.reshape(1, new_point.size)
 
 		#Calculate shift distance
 		shift = spatial.distance.euclidean(point, new_point)
 		point = new_point
 
-	return point, list(cpts)
+	return point, list(set(cpts))
 
 def meanshift_opt(data, r, c, tree=None):
 	"""
@@ -137,7 +136,7 @@ def meanshift_opt(data, r, c, tree=None):
 	Associates all points within the window r with the found peak.
 
 	Args:
-		data: image data.
+		data: image data in the format [number of pixels]x[feature vector].
 		r: window size.
 		tree: cKDTree generated from data.
 
@@ -145,20 +144,18 @@ def meanshift_opt(data, r, c, tree=None):
 		A list of labels for the data point, that indicates which
 		peak each pixel of the image belongs to, and the list of peaks.
 	"""
-	skipped = 0
 	peaks = []
 	labels = np.zeros(data.shape[0], dtype=int) - 1
-	bar = Bar("Processing", max=data.shape[0])
-	for i in range(data.shape[0]):
-		bar.next()
+	#bar = Bar("Processing", max=data.shape[0])
+	for i, point in enumerate(tqdm(data)):
+		#bar.next()
 		if labels[i] != -1:
-			skipped += 1
 			continue
 
 		peak, cpts = findpeak_opt(data, i, r, c, tree)
 
 		if tree == None:
-			distances = spatial.distance.cdist(peak, data)
+			distances = spatial.distance.cdist(np.array([peak]), data)
 			neighbors_in_range = np.where(distances <= r)[1]
 		else:
 			neighbors_in_range = tree.query_ball_point(peak, r)[0]
@@ -167,7 +164,7 @@ def meanshift_opt(data, r, c, tree=None):
 			peaks.append(peak)
 			labels[i] = len(peaks) - 1
 		else:
-			distances = spatial.distance.cdist(peak, np.array(peaks).reshape(len(peaks), peak.size))[0]
+			distances = spatial.distance.cdist(np.array([peak]), np.array(peaks))[0]
 			min_dist = np.min(distances)
 			if min_dist < r/2.0:
 				labels[i] = np.argmin(distances)
@@ -178,33 +175,42 @@ def meanshift_opt(data, r, c, tree=None):
 		labels[neighbors_in_range] = labels[i]
 		labels[cpts] = labels[i]
 
-	bar.finish()
-	logger.info("Skipped {:.2f}% of pixels".format(100*(skipped/float(data.shape[0]))))
+	#bar.finish()
 
-	return labels, np.array(peaks).reshape(len(peaks), peak.size)
+	return labels, np.array(peaks)
 
-def plotclusters2D(data, labels, peaks):
+def plotclusters3D(data, labels, peaks):
 	"""
-	Plots the modes of the given image data in 2D by coloring each pixel
+	Plots the modes of the given image data in 3D by coloring each pixel
 	according to its corresponding peak.
 
 	Args:
-		data: image data.
+		data: image data in the format [number of pixels]x[feature vector].
 		labels: a list of labels, one for each pixel.
 		peaks: a list of vectors, whose first three components can
 		be interpreted as BGR values.
 	"""
 	fig = plt.figure()
-	ax = fig.add_subplot(111)
-	bgr_peaks = np.array(peaks[:, 0:3])
+	ax = fig.add_subplot(111, projection="3d")
+	bgr_peaks = np.array(peaks[:, 0:3], dtype=float)
 	rgb_peaks = bgr_peaks[...,::-1]
 	rgb_peaks /= 255.0
 	for idx, peak in enumerate(rgb_peaks):
-		cluster = data[:, np.where(labels == idx)[0]]
-		ax.scatter(cluster[0], cluster[1], c=[peak])
+		cluster = data[np.where(labels == idx)[0]].T
+		ax.scatter(cluster[0], cluster[1], cluster[2], c=[peak], s=.5)
 	fig.show()
 
-def imSegment(im, r, c=4.0, use_spatial_features=False):
+def plotpicdata3D(path):
+	im = cv2.imread(path)
+	im = cv2.cvtColor(im, cv2.COLOR_BGR2LAB)
+	im = im.reshape(im.shape[0]*im.shape[1], im.shape[2]).T
+
+	fig = plt.figure()
+	ax = fig.add_subplot(111, projection="3d")
+	ax.scatter(im[0], im[1], im[2], c="black", s=0.5)
+	fig.show()
+
+def imSegment(im, r, c=4.0, use_spatial_features=False, use_cKDtree=False):
 	"""
 	Segments the given image with the mean shift algorithm.
 
@@ -240,14 +246,17 @@ def imSegment(im, r, c=4.0, use_spatial_features=False):
 		data = np.array(im)
 
 	# Initialize cKDTree
-	tree = spatial.cKDTree(data)
+	if use_cKDtree:
+		tree = spatial.cKDTree(data)
+	else:
+		tree = None
 
 	start = datetime.datetime.now()
 	labels, peaks = meanshift_opt(data, r, c, tree)
 	#labels, peaks = meanshift(data, r, tree)
 	end = datetime.datetime.now()
 	time_elapsed = (end-start).total_seconds()
-	logger.info("Time elapsed: {} seconds".format(time_elapsed))
+	print("Time elapsed: {} seconds".format(time_elapsed))
 
 	peaks[:, 0:3] = cv2.cvtColor(np.array([peaks[:, 0:3]], dtype=np.uint8), cv2.COLOR_LAB2BGR)[0]
 	peaks = np.array(peaks, dtype=np.uint8)
@@ -261,20 +270,13 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
 		description="Applies mean shift to given image file. Runs predefined window sizes on the image if window size is not explicitly specified.")
 	parser.add_argument("img_file", type=str, help="image to process")
-	parser.add_argument("--r", type=int, default=None, help="size of the search window")
-	parser.add_argument("--c", type=int, default=4, help="denominator for path window size. " +
+	parser.add_argument("--r", type=float, default=None, help="size of the search window")
+	parser.add_argument("--c", type=float, default=4, help="denominator for path window size. " +
 		"Points within r/c of the search path will be associated with corresponding peak")
 	parser.add_argument("--use_spatial_features", help="use x/y coordinates in addition to color space", action="store_true")
+	parser.add_argument("--use_cKDTree", help="use a cKDTree for calculating the nearest neighbors", action="store_true")
 	parser.add_argument("--output_dir", type=str, default="output", help="directory to write output to")
-	parser.add_argument("--logfile_name", type=str, default="log.txt", help="name of the log file")
 	args = parser.parse_args()
-
-	if not os.path.isdir(args.output_dir):
-		os.makedirs(args.output_dir)
-
-	logging.basicConfig(filename=os.path.join(args.output_dir, args.logfile_name), level=logging.INFO, filemode="w")
-	logger = logging.getLogger(__name__)
-	logger.addHandler(logging.StreamHandler())
 
 	im = cv2.imread(args.img_file)
 	#im = cv2.resize(im, (0,0), fx=0.2, fy=0.2)
@@ -282,10 +284,13 @@ if __name__ == "__main__":
 	if args.r != None:
 		# Results are not saved in files when using custom window sizes.
 		# Run script while in python shell and use result variables afterwards for whatever you want.
-		logger.info("Processing {} with r={}, c={}, using spatial features: {}".format(args.img_file, args.r, args.c, args.use_spatial_features))
+		print("Processing {} with r={}, c={}, using spatial features: {}".format(args.img_file, args.r, args.c, args.use_spatial_features))
 
-		segIm, labels, peaks = imSegment(im=im, r=args.r, c=args.c, use_spatial_features=args.use_spatial_features)
+		segIm, labels, peaks = imSegment(im=im, r=args.r, c=args.c, use_spatial_features=args.use_spatial_features, use_cKDtree=args.use_cKDTree)
 	else:
+		if not os.path.isdir(args.output_dir):
+			os.makedirs(args.output_dir)
+
 		rs = [4, 8, 16, 32]
 		cs = [4, 8, 16]
 		flags = [False, True]
@@ -293,7 +298,7 @@ if __name__ == "__main__":
 		for r in rs:
 			for c in cs:
 				for f in flags:
-					logger.info("Processing {} with r={}, c={}, using spatial features: {}".format(args.img_file, r, c, f))
+					print("Processing {} with r={}, c={}, using spatial features: {}".format(args.img_file, r, c, f))
 					segIm, labels, peaks = imSegment(im=im, r=r, c=c, use_spatial_features=f)
 
 					peaks_filename = os.path.join(args.output_dir, "peaks_r{}_c{}_{}.txt".format(r, c, "3D" if f == False else "5D"))
