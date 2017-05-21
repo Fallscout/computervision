@@ -8,7 +8,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy import spatial
-from progress.bar import Bar
 from tqdm import tqdm
 
 def findpeak(data, idx, r, tree=None):
@@ -146,9 +145,7 @@ def meanshift_opt(data, r, c, tree=None):
 	"""
 	peaks = []
 	labels = np.zeros(data.shape[0], dtype=int) - 1
-	#bar = Bar("Processing", max=data.shape[0])
 	for i, point in enumerate(tqdm(data)):
-		#bar.next()
 		if labels[i] != -1:
 			continue
 
@@ -174,8 +171,6 @@ def meanshift_opt(data, r, c, tree=None):
 
 		labels[neighbors_in_range] = labels[i]
 		labels[cpts] = labels[i]
-
-	#bar.finish()
 
 	return labels, np.array(peaks)
 
@@ -210,7 +205,7 @@ def plotpicdata3D(path):
 	ax.scatter(im[0], im[1], im[2], c="black", s=0.5)
 	fig.show()
 
-def imSegment(im, r, c=4.0, use_spatial_features=False, use_cKDtree=False):
+def imSegment(im, r, c=4.0, use_spatial_features=False, use_cKDTree=False):
 	"""
 	Segments the given image with the mean shift algorithm.
 
@@ -246,7 +241,7 @@ def imSegment(im, r, c=4.0, use_spatial_features=False, use_cKDtree=False):
 		data = np.array(im)
 
 	# Initialize cKDTree
-	if use_cKDtree:
+	if use_cKDTree:
 		tree = spatial.cKDTree(data)
 	else:
 		tree = None
@@ -286,7 +281,7 @@ if __name__ == "__main__":
 		# Run script while in python shell and use result variables afterwards for whatever you want.
 		print("Processing {} with r={}, c={}, using spatial features: {}".format(args.img_file, args.r, args.c, args.use_spatial_features))
 
-		segIm, labels, peaks = imSegment(im=im, r=args.r, c=args.c, use_spatial_features=args.use_spatial_features, use_cKDtree=args.use_cKDTree)
+		segIm, labels, peaks = imSegment(im=im, r=args.r, c=args.c, use_spatial_features=args.use_spatial_features, use_cKDTree=args.use_cKDTree)
 	else:
 		if not os.path.isdir(args.output_dir):
 			os.makedirs(args.output_dir)
@@ -299,7 +294,7 @@ if __name__ == "__main__":
 			for c in cs:
 				for f in flags:
 					print("Processing {} with r={}, c={}, using spatial features: {}".format(args.img_file, r, c, f))
-					segIm, labels, peaks = imSegment(im=im, r=r, c=c, use_spatial_features=f)
+					segIm, labels, peaks = imSegment(im=im, r=r, c=c, use_spatial_features=f, use_cKDTree=args.use_cKDTree)
 
 					peaks_filename = os.path.join(args.output_dir, "peaks_r{}_c{}_{}.txt".format(r, c, "3D" if f == False else "5D"))
 					labels_filename = os.path.join(args.output_dir, "labels_r{}_c{}_{}.txt".format(r, c, "3D" if f == False else "5D"))
