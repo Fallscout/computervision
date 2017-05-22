@@ -1,72 +1,72 @@
-INFO:__main__:Processing .\pic2.jpg with r=4, c=4, using spatial features: False
-INFO:__main__:Skipped 96.41% of pixels
-INFO:__main__:Time elapsed: 705.287492 seconds
-INFO:__main__:Processing .\pic2.jpg with r=4, c=4, using spatial features: True
-INFO:__main__:Skipped 94.36% of pixels
-INFO:__main__:Time elapsed: 1630.428459 seconds
-INFO:__main__:Processing .\pic2.jpg with r=4, c=8, using spatial features: False
-INFO:__main__:Skipped 92.78% of pixels
-INFO:__main__:Time elapsed: 1524.76369 seconds
-INFO:__main__:Processing .\pic2.jpg with r=4, c=8, using spatial features: True
-INFO:__main__:Skipped 89.83% of pixels
-INFO:__main__:Time elapsed: 3243.902439 seconds
-INFO:__main__:Processing .\pic2.jpg with r=4, c=16, using spatial features: False
-INFO:__main__:Skipped 91.87% of pixels
-INFO:__main__:Time elapsed: 1761.564049 seconds
-INFO:__main__:Processing .\pic2.jpg with r=4, c=16, using spatial features: True
-INFO:__main__:Skipped 85.74% of pixels
-INFO:__main__:Time elapsed: 4646.265621 seconds
-INFO:__main__:Processing .\pic2.jpg with r=8, c=4, using spatial features: False
-INFO:__main__:Skipped 98.47% of pixels
-INFO:__main__:Time elapsed: 475.585258 seconds
-INFO:__main__:Processing .\pic2.jpg with r=8, c=4, using spatial features: True
-INFO:__main__:Skipped 98.30% of pixels
-INFO:__main__:Time elapsed: 717.542287 seconds
-INFO:__main__:Processing .\pic2.jpg with r=8, c=8, using spatial features: False
-INFO:__main__:Skipped 95.75% of pixels
-INFO:__main__:Time elapsed: 1320.465947 seconds
-INFO:__main__:Processing .\pic2.jpg with r=8, c=8, using spatial features: True
-INFO:__main__:Skipped 92.44% of pixels
-INFO:__main__:Time elapsed: 3212.696799 seconds
-INFO:__main__:Processing .\pic2.jpg with r=8, c=16, using spatial features: False
-INFO:__main__:Skipped 90.85% of pixels
-INFO:__main__:Time elapsed: 2766.223259 seconds
-INFO:__main__:Processing .\pic2.jpg with r=8, c=16, using spatial features: True
-INFO:__main__:Skipped 87.64% of pixels
-INFO:__main__:Time elapsed: 5174.401994 seconds
-INFO:__main__:Processing .\pic2.jpg with r=16, c=4, using spatial features: False
-INFO:__main__:Skipped 99.60% of pixels
-INFO:__main__:Time elapsed: 86.913271 seconds
-INFO:__main__:Processing .\pic2.jpg with r=16, c=4, using spatial features: True
-INFO:__main__:Skipped 99.60% of pixels
-INFO:__main__:Time elapsed: 122.463008 seconds
-INFO:__main__:Processing .\pic2.jpg with r=16, c=8, using spatial features: False
-INFO:__main__:Skipped 98.18% of pixels
-INFO:__main__:Time elapsed: 371.545608 seconds
-INFO:__main__:Processing .\pic2.jpg with r=16, c=8, using spatial features: True
-INFO:__main__:Skipped 97.95% of pixels
-INFO:__main__:Time elapsed: 586.359824 seconds
-INFO:__main__:Processing .\pic2.jpg with r=16, c=16, using spatial features: False
-INFO:__main__:Skipped 95.01% of pixels
-INFO:__main__:Time elapsed: 1000.862027 seconds
-INFO:__main__:Processing .\pic2.jpg with r=16, c=16, using spatial features: True
-INFO:__main__:Skipped 90.55% of pixels
-INFO:__main__:Time elapsed: 2640.384979 seconds
-INFO:__main__:Processing .\pic2.jpg with r=32, c=4, using spatial features: False
-INFO:__main__:Skipped 99.94% of pixels
-INFO:__main__:Time elapsed: 13.516715 seconds
-INFO:__main__:Processing .\pic2.jpg with r=32, c=4, using spatial features: True
-INFO:__main__:Skipped 99.94% of pixels
-INFO:__main__:Time elapsed: 16.470082 seconds
-INFO:__main__:Processing .\pic2.jpg with r=32, c=8, using spatial features: False
-INFO:__main__:Skipped 99.73% of pixels
-INFO:__main__:Time elapsed: 40.550148 seconds
-INFO:__main__:Processing .\pic2.jpg with r=32, c=8, using spatial features: True
-INFO:__main__:Skipped 99.73% of pixels
-INFO:__main__:Time elapsed: 55.176329 seconds
-INFO:__main__:Processing .\pic2.jpg with r=32, c=16, using spatial features: False
-INFO:__main__:Skipped 99.47% of pixels
-INFO:__main__:Time elapsed: 69.614992 seconds
-INFO:__main__:Processing .\pic2.jpg with r=32, c=16, using spatial features: True
-INFO:__main__:Skipped 98.65% of pixels
-INFO:__main__:Time elapsed: 254.958077 seconds
+Processing pic2.jpg with r=4, c=4, using spatial features: False
+100%|████████████████████████████████████████████████████████████████████████| 154401/154401 [01:29<00:00, 1727.27it/s]
+Time elapsed: 89.405982 seconds
+Processing pic2.jpg with r=4, c=4, using spatial features: True
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [03:11<00:00, 806.19it/s]
+Time elapsed: 191.518615 seconds
+Processing pic2.jpg with r=4, c=8, using spatial features: False
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [03:36<00:00, 714.20it/s]
+Time elapsed: 216.186851 seconds
+Processing pic2.jpg with r=4, c=8, using spatial features: True
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [07:00<00:00, 366.76it/s]
+Time elapsed: 420.98311 seconds
+Processing pic2.jpg with r=4, c=16, using spatial features: False
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [04:13<00:00, 610.24it/s]
+Time elapsed: 253.014865 seconds
+Processing pic2.jpg with r=4, c=16, using spatial features: True
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [11:14<00:00, 228.89it/s]
+Time elapsed: 674.56047 seconds
+Processing pic2.jpg with r=8, c=4, using spatial features: False
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [02:42<00:00, 952.82it/s]
+Time elapsed: 162.046388 seconds
+Processing pic2.jpg with r=8, c=4, using spatial features: True
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [03:19<00:00, 772.37it/s]
+Time elapsed: 199.905649 seconds
+Processing pic2.jpg with r=8, c=8, using spatial features: False
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [07:49<00:00, 328.51it/s]
+Time elapsed: 469.998586 seconds
+Processing pic2.jpg with r=8, c=8, using spatial features: True
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [17:41<00:00, 145.45it/s]
+Time elapsed: 1061.536697 seconds
+Processing pic2.jpg with r=8, c=16, using spatial features: False
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [20:26<00:00, 125.93it/s]
+Time elapsed: 1226.090272 seconds
+Processing pic2.jpg with r=8, c=16, using spatial features: True
+100%|██████████████████████████████████████████████████████████████████████████| 154401/154401 [32:19<00:00, 79.63it/s]
+Time elapsed: 1939.012704 seconds
+Processing pic2.jpg with r=16, c=4, using spatial features: False
+100%|████████████████████████████████████████████████████████████████████████| 154401/154401 [01:26<00:00, 1779.30it/s]
+Time elapsed: 86.792043 seconds
+Processing pic2.jpg with r=16, c=4, using spatial features: True
+100%|████████████████████████████████████████████████████████████████████████| 154401/154401 [01:51<00:00, 1381.59it/s]
+Time elapsed: 111.758221 seconds
+Processing pic2.jpg with r=16, c=8, using spatial features: False
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [06:26<00:00, 400.00it/s]
+Time elapsed: 386.003113 seconds
+Processing pic2.jpg with r=16, c=8, using spatial features: True
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [09:00<00:00, 285.54it/s]
+Time elapsed: 540.737667 seconds
+Processing pic2.jpg with r=16, c=16, using spatial features: False
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [16:53<00:00, 152.28it/s]
+Time elapsed: 1013.95176 seconds
+Processing pic2.jpg with r=16, c=16, using spatial features: True
+100%|██████████████████████████████████████████████████████████████████████████| 154401/154401 [41:16<00:00, 62.35it/s]
+Time elapsed: 2476.225962 seconds
+Processing pic2.jpg with r=32, c=4, using spatial features: False
+100%|████████████████████████████████████████████████████████████████████████| 154401/154401 [00:15<00:00, 9735.66it/s]
+Time elapsed: 15.859329 seconds
+Processing pic2.jpg with r=32, c=4, using spatial features: True
+100%|████████████████████████████████████████████████████████████████████████| 154401/154401 [00:21<00:00, 7282.01it/s]
+Time elapsed: 21.203063 seconds
+Processing pic2.jpg with r=32, c=8, using spatial features: False
+100%|████████████████████████████████████████████████████████████████████████| 154401/154401 [01:22<00:00, 1868.70it/s]
+Time elapsed: 82.624751 seconds
+Processing pic2.jpg with r=32, c=8, using spatial features: True
+100%|████████████████████████████████████████████████████████████████████████| 154401/154401 [01:47<00:00, 1438.59it/s]
+Time elapsed: 107.343427 seconds
+Processing pic2.jpg with r=32, c=16, using spatial features: False
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [05:56<00:00, 433.37it/s]
+Time elapsed: 356.280178 seconds
+Processing pic2.jpg with r=32, c=16, using spatial features: True
+100%|█████████████████████████████████████████████████████████████████████████| 154401/154401 [08:34<00:00, 299.91it/s]
+Time elapsed: 514.826568 seconds

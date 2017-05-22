@@ -1,0 +1,72 @@
+INFO:__main__:Processing .\pic3.jpg with r=4, c=4, using spatial features: False
+INFO:__main__:Skipped 94.53% of pixels
+INFO:__main__:Time elapsed: 926.856056 seconds
+INFO:__main__:Processing .\pic3.jpg with r=4, c=4, using spatial features: True
+INFO:__main__:Skipped 92.14% of pixels
+INFO:__main__:Time elapsed: 1941.141041 seconds
+INFO:__main__:Processing .\pic3.jpg with r=4, c=8, using spatial features: False
+INFO:__main__:Skipped 89.84% of pixels
+INFO:__main__:Time elapsed: 1747.547294 seconds
+INFO:__main__:Processing .\pic3.jpg with r=4, c=8, using spatial features: True
+INFO:__main__:Skipped 87.17% of pixels
+INFO:__main__:Time elapsed: 3224.182089 seconds
+INFO:__main__:Processing .\pic3.jpg with r=4, c=16, using spatial features: False
+INFO:__main__:Skipped 88.52% of pixels
+INFO:__main__:Time elapsed: 1999.739519 seconds
+INFO:__main__:Processing .\pic3.jpg with r=4, c=16, using spatial features: True
+INFO:__main__:Skipped 83.04% of pixels
+INFO:__main__:Time elapsed: 4250.061767 seconds
+INFO:__main__:Processing .\pic3.jpg with r=8, c=4, using spatial features: False
+INFO:__main__:Skipped 97.35% of pixels
+INFO:__main__:Time elapsed: 955.608376 seconds
+INFO:__main__:Processing .\pic3.jpg with r=8, c=4, using spatial features: True
+INFO:__main__:Skipped 97.12% of pixels
+INFO:__main__:Time elapsed: 1516.669283 seconds
+INFO:__main__:Processing .\pic3.jpg with r=8, c=8, using spatial features: False
+INFO:__main__:Skipped 92.98% of pixels
+INFO:__main__:Time elapsed: 2514.48419 seconds
+INFO:__main__:Processing .\pic3.jpg with r=8, c=8, using spatial features: True
+INFO:__main__:Skipped 88.67% of pixels
+INFO:__main__:Time elapsed: 5874.208472 seconds
+INFO:__main__:Processing .\pic3.jpg with r=8, c=16, using spatial features: False
+INFO:__main__:Skipped 85.66% of pixels
+INFO:__main__:Time elapsed: 5030.1091 seconds
+INFO:__main__:Processing .\pic3.jpg with r=8, c=16, using spatial features: True
+INFO:__main__:Skipped 82.14% of pixels
+INFO:__main__:Time elapsed: 7455.409157 seconds
+INFO:__main__:Processing .\pic3.jpg with r=16, c=4, using spatial features: False
+INFO:__main__:Skipped 99.20% of pixels
+INFO:__main__:Time elapsed: 222.634673 seconds
+INFO:__main__:Processing .\pic3.jpg with r=16, c=4, using spatial features: True
+INFO:__main__:Skipped 99.19% of pixels
+INFO:__main__:Time elapsed: 310.643636 seconds
+INFO:__main__:Processing .\pic3.jpg with r=16, c=8, using spatial features: False
+INFO:__main__:Skipped 96.84% of pixels
+INFO:__main__:Time elapsed: 850.061424 seconds
+INFO:__main__:Processing .\pic3.jpg with r=16, c=8, using spatial features: True
+INFO:__main__:Skipped 96.46% of pixels
+INFO:__main__:Time elapsed: 1299.858891 seconds
+INFO:__main__:Processing .\pic3.jpg with r=16, c=16, using spatial features: False
+INFO:__main__:Skipped 91.86% of pixels
+INFO:__main__:Time elapsed: 5863.947939 seconds
+INFO:__main__:Processing .\pic3.jpg with r=16, c=16, using spatial features: True
+INFO:__main__:Skipped 85.58% of pixels
+INFO:__main__:Time elapsed: 5867.572371 seconds
+INFO:__main__:Processing .\pic3.jpg with r=32, c=4, using spatial features: False
+INFO:__main__:Skipped 99.88% of pixels
+INFO:__main__:Time elapsed: 34.268257 seconds
+INFO:__main__:Processing .\pic3.jpg with r=32, c=4, using spatial features: True
+INFO:__main__:Skipped 99.88% of pixels
+INFO:__main__:Time elapsed: 44.576228 seconds
+INFO:__main__:Processing .\pic3.jpg with r=32, c=8, using spatial features: False
+INFO:__main__:Skipped 99.44% of pixels
+INFO:__main__:Time elapsed: 120.010918 seconds
+INFO:__main__:Processing .\pic3.jpg with r=32, c=8, using spatial features: True
+INFO:__main__:Skipped 99.43% of pixels
+INFO:__main__:Time elapsed: 166.778638 seconds
+INFO:__main__:Processing .\pic3.jpg with r=32, c=16, using spatial features: False
+INFO:__main__:Skipped 97.85% of pixels
+INFO:__main__:Time elapsed: 444.588208 seconds
+INFO:__main__:Processing .\pic3.jpg with r=32, c=16, using spatial features: True
+INFO:__main__:Skipped 97.58% of pixels
+INFO:__main__:Time elapsed: 676.488663 seconds
