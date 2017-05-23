@@ -4,6 +4,7 @@ import argparse
 import datetime
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 from scipy.io import loadmat
 from sklearn.decomposition import PCA
 from sklearn.neighbors import NearestNeighbors
@@ -31,6 +32,11 @@ def main():
 	train_labels = labels[spec["trainIdx"].flatten()-1].flatten()
 	test_data = data[spec["testIdx"].flatten()-1]
 	test_labels = labels[spec["testIdx"].flatten()-1].flatten()
+
+	if args.k > len(train_data):
+		print("Warning: specified more principal components than there are images in the training set. " +
+			"Using {} principal components instead.".format(len(train_data)))
+		args.k = len(train_data)
 
 	train_descriptors, eigenvectors, mean = pca(train_data, args.k, args.use_sklearn)
 	test_descriptors = np.dot(test_data-mean, eigenvectors.T)
@@ -95,16 +101,34 @@ def pca(data, k, use_sklearn=False):
 
 	return descriptors, eigenvectors, mean
 
-def plot_eigenfaces(eigenfaces, rows, columns):
+def normalize(data, low, high):
+	X = np.copy(data)
+	X -= np.min(X)
+	X /= np.max(X) - np.min(X)
+	X *= (high - low)
+	X += low
+	return np.array(X, dtype=np.uint8)
+
+def reconstruct(mean, eigenvectors, descriptor):
+	return mean + np.dot(eigenvectors.T, descriptor)
+
+def plot_reconstruction(mean, eigenvectors, descriptor, rows, columns):
+	reconstructions = []
+
+	for i in range(10, min(len(eigenvectors), 320), 20):
+		reconstructions.append(reconstruct(mean, eigenvectors[:i], descriptor[:i]).reshape(32, 32))
+
+	plot_faces(reconstructions, rows, columns)
+
+def plot_faces(faces, rows, columns):
 	fig = plt.figure()
 	
-	for i, face in enumerate(eigenfaces):
+	for i, face in enumerate(faces):
 		ax = fig.add_subplot(rows, columns, i+1)
 		ax.axis("off")
-		ax.imshow(np.rot90(face, k=3), cmap="binary")
+		ax.imshow(np.rot90(face, k=3), cmap=cm.gray)
 
 	fig.show()
 
 if __name__ == "__main__":
 	mean, eigenfaces = main()
-	#plot_eigenfaces(eigenfaces, 10, 12)
