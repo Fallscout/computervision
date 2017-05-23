@@ -28,22 +28,20 @@ def findpeak(data, idx, r, tree=None):
 
 	# Get point of interest
 	point = data[idx]
-	point = point.reshape(1, point.size)
 
 	while shift > t:		
 
 		# Determine points in window
 		if tree == None:
-			distances = spatial.distance.cdist(point, data)
+			distances = spatial.distance.cdist(np.array([point]), data)
 			close_points = np.where(distances <= r)[1]
 		else:
-			close_points = tree.query_ball_point(point, r)[0]
+			close_points = tree.query_ball_point(point, r)
 
 		neighbors = data[close_points]
 
 		# Calculate new mean
 		new_point = np.mean(neighbors, axis=0)
-		new_point = new_point.reshape(1, new_point.size)
 
 		#Calculate shift distance
 		shift = spatial.distance.euclidean(point, new_point)
@@ -66,14 +64,14 @@ def meanshift(data, r, tree=None):
 	"""
 	peaks = []
 	labels = np.zeros(data.shape[0], dtype=int) - 1
-	for i in range(data.shape[0]):
+	for i, point in enumerate(tqdm(data)):
 		peak = findpeak(data, i, r, tree)
 
 		if len(peaks) == 0:
 			peaks.append(peak)
 			labels[i] = len(peaks) - 1
 		else:
-			distances = spatial.distance.cdist(peak, np.array(peaks))[0]
+			distances = spatial.distance.cdist(np.array([peak]), data)
 			min_dist = np.min(distances)
 			if min_dist < r/2.0:
 				labels[i] = np.argmin(distances)
@@ -116,7 +114,6 @@ def findpeak_opt(data, idx, r, c, tree=None):
 		else:
 			close_points = tree.query_ball_point(point, r)
 			cpts.extend(tree.query_ball_point(point, r/c))
-
 		
 		neighbors = data[close_points]
 
@@ -247,14 +244,15 @@ def imSegment(im, r, c=4.0, use_spatial_features=False, use_cKDTree=False):
 		tree = None
 
 	start = datetime.datetime.now()
+
 	labels, peaks = meanshift_opt(data, r, c, tree)
 	#labels, peaks = meanshift(data, r, tree)
+
 	end = datetime.datetime.now()
 	time_elapsed = (end-start).total_seconds()
 	print("Time elapsed: {} seconds".format(time_elapsed))
 
 	peaks[:, 0:3] = cv2.cvtColor(np.array([peaks[:, 0:3]], dtype=np.uint8), cv2.COLOR_LAB2BGR)[0]
-	peaks = np.array(peaks, dtype=np.uint8)
 
 	im = peaks[:, 0:3][labels]
 	im = im.reshape(orig_img.shape[0], orig_img.shape[1], orig_img.shape[2])
