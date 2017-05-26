@@ -58,25 +58,6 @@ def im_stitch(img_left, img_right, use_sift=False):
 
     return result
 
-def match_keypoints(kpsA, kpsB, featuresA, featuresB, ratio, reprojThresh):
-    matcher = cv2.DescriptorMatcher_create("BruteForce")
-    rawMatches = matcher.knnMatch(featuresA, featuresB, 2)
-    matches = []
-
-    for m in rawMatches:
-        if len(m) == 2 and m[0].distance < m[1].distance * ratio:
-            matches.append((m[0].trainIdx, m[0].queryIdx))
-
-    if len(matches) > 4:
-        ptsA = np.float32([kpsA[i] for (_, i) in matches])
-        ptsB = np.float32([kpsB[i] for (i, _) in matches])
-
-        (H, status) = cv2.findHomography(ptsA, ptsB, cv2.RANSAC, reprojThresh)
-
-        return (matches, H, status)
-
-    return None
-
 def select_matches(patches1, patches2, corr_indices):
     corr_points = []
 
