@@ -8,8 +8,24 @@ from sklearn.decomposition import PCA
 from sklearn.neighbors import NearestNeighbors
 from sklearn.metrics import accuracy_score
 
+
 def test(data, eigenvectors, mean, train_descriptors, train_labels, test_labels):
-	test_descriptors = np.dot(data-mean, eigenvectors.T)
+	"""
+	Projects the given faces onto the subspace defined by eigenvectors and classifies them
+	via nearest neighbor approach against the given descriptors.
+
+	Args:
+		data: the face data to classify.
+		mean: the mean face of the training data.
+		train_descriptors: the descriptors for the training set faces.
+		train_labels: the labels for the training data.
+		test_labels: the labels for the test data.
+
+	Returns:
+		Classification accuracy, describing how many test faces have been
+		labeled as the right person.
+	"""
+	test_descriptors = np.dot(data - mean, eigenvectors.T)
 
 	nn = NearestNeighbors(n_neighbors=1).fit(train_descriptors)
 	distances, indices = nn.kneighbors(test_descriptors)
@@ -135,10 +151,11 @@ def plot_reconstruction(mean, eigenvectors, descriptor, rows, columns):
 	titles = []
 
 	for i in range(10, min(len(eigenvectors), 320), 20):
-		reconstructions.append(reconstruct(mean, eigenvectors[:i], descriptor[:i]).reshape(32, 32))
-		titles.append("{} eigenfaces".format(i))
+	    reconstructions.append(reconstruct(mean, eigenvectors[:i], descriptor[:i]).reshape(32, 32))
+	    titles.append("{} eigenfaces".format(i))
 
 	plot_faces(reconstructions, rows, columns, titles)
+
 
 def plot_faces(faces, rows, columns, sptitle=None):
 	"""
@@ -167,7 +184,7 @@ def plot_faces(faces, rows, columns, sptitle=None):
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 	parser.add_argument("--datafile", default="faces/ORL_32x32.mat", help="file with face data")
-	parser.add_argument("--specfile", default="faces/3Train/3.mat", help="matrix specifying which images to use for training and testing")
+	parser.add_argument("--specfile", default="faces/5Train/5.mat", help="matrix specifying which images to use for training and testing")
 	parser.add_argument("--k", help="number of principal components to use", type=int, default=None)
 	parser.add_argument("--use_sklearn", help="", action="store_true")
 	args = parser.parse_args()
@@ -208,5 +225,3 @@ if __name__ == "__main__":
 			
 			score = test(test_data, eigenvectors, mean, train_descriptors, train_labels, test_labels)
 			scores.append(score)
-
-
