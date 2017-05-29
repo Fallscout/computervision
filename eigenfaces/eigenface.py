@@ -18,6 +18,16 @@ def test(data, eigenvectors, mean, train_descriptors, train_labels, test_labels)
 	return accuracy_score(test_labels, predicted_labels)
 
 def load_data(path):
+	"""
+	Loads the face data from the provided file.
+
+	Args:
+		path: the path to the .mat file.
+
+	Returns:
+		data: The image data.
+		labels: The labels for the images.
+	"""
 	if not os.path.isfile(path):
 		raise IOError("Argument is not a file")
 	else:
@@ -27,6 +37,17 @@ def load_data(path):
 		return data, labels
 
 def load_spec(path):
+	"""
+	Loads the train/test specification from the provided file.
+	This file indicates which images from the dataset are used
+	for training and for testing.
+
+	Args:
+		path: the path to the .mat file.
+
+	Returns:
+		A dictionary containing the specification.
+	"""
 	if not os.path.isfile(path):
 		raise IOError("Argument is not a file")
 	else:
@@ -34,6 +55,22 @@ def load_spec(path):
 		return mat
 
 def pca(data, k, use_sklearn=False):
+	"""
+	Applies principal component analysis to the given data, calculating the
+	first k principal components.
+
+	Args:
+		data: the data to calculate the principal components for
+		(in the format observation x feature vector).
+		k: the number of principal components to calculate.
+		use_sklearn: a flag to indicate whether sklearn should be used to do
+		the PCA (for comparison with the own implementation)
+
+	Returns:
+		descriptors: the projection of the data onto the new subspace.
+		eigenvectors: the eigenvectors corresponding to the k highest eigenvalues.
+		mean: the mean of the data.
+	"""
 	mean = np.mean(data, axis=0)
 	X = data - mean
 
@@ -69,9 +106,31 @@ def pca(data, k, use_sklearn=False):
 	return descriptors, eigenvectors, mean
 
 def reconstruct(mean, eigenvectors, descriptor):
+	"""
+	Reconstructs the image of a face from the mean face, the eigenvectors
+	and the image's descriptors.
+
+	Args:
+		mean: the mean face.
+		eigenvectors: the eigenvectors of the face subspace.
+		descriptor: the target face's descriptor.
+
+	Returns:
+		The reconstructed face image as a row vector.
+	"""
 	return mean + np.dot(eigenvectors.T, descriptor)
 
 def plot_reconstruction(mean, eigenvectors, descriptor, rows, columns):
+	"""
+	Plots the reconstruction of a face with varying numbers of eigenfaces.
+
+	Args:
+		mean: the mean face.
+		eigenvectors: the eigenvectors of the face subspace.
+		descriptor: the target face's descriptor.
+		rows: number of rows in the plot.
+		columns: number of columns in the plot.
+	"""
 	reconstructions = []
 	titles = []
 
@@ -82,6 +141,15 @@ def plot_reconstruction(mean, eigenvectors, descriptor, rows, columns):
 	plot_faces(reconstructions, rows, columns, titles)
 
 def plot_faces(faces, rows, columns, sptitle=None):
+	"""
+	Plots the given image data in rows x columns subplots.
+
+	Args:
+		faces: the face data.
+		rows: number of rows in the plot.
+		columns: number of columns in the plot.
+		sptitle: titles for the subplots.
+	"""
 	fig = plt.figure()
 	
 	for i, face in enumerate(faces):
@@ -131,6 +199,8 @@ if __name__ == "__main__":
 		score = test(test_data, eigenvectors, mean, train_descriptors, train_labels, test_labels)
 		print("Accuracy: {}".format(score))
 	else:
+		# If no k is specified, calculate accuracies for all possible values of k and
+		# return scores array to global scope
 		scores = []
 		for k in range(1, len(train_data)+1):
 			train_descriptors, eigenvectors, mean = pca(train_data, k, args.use_sklearn)
