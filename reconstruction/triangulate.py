@@ -1,14 +1,12 @@
 import numpy as np
 import cv2
 
-def triangulate(camera1, camera2, matches):
-    points1 = matches[:, :2].T
-    points2 = matches[:, 2:].T
-    result = cv2.triangulatePoints(camera1, camera2, points1, points2).T
+def triangulate(matchpoints1, matchpoints2, camera1, camera2):
+    result = cv2.triangulatePoints(camera1, camera2, matchpoints1.T, matchpoints2.T).T
     result /= result[:, 3].reshape(-1, 1)
     return result[:, :3]
 
-def fit_fundamental(matches):
+def FMatrix(matchepoints1, matchpoints2):
     """
     # Own implementation does not work correctly
 
@@ -21,20 +19,16 @@ def fit_fundamental(matches):
     F /= F[2, 2]
     return F
     """
+    return cv2.findFundamentalMat(matchepoints1, matchpoints2)[0]
 
-    base_points = np.array([x[:2] for x in matches])
-    target_points = np.array([x[2:] for x in matches])
-
-    F, mask = cv2.findFundamentalMat(base_points, target_points)
-
-    return F
-
-def visualize_matches(img1, img2, matches):
+def visualize_matches(points):
     import matplotlib.pyplot as plt
-    img1_rgb = img1[...::-1]
-    img2_rgb = img2[...::-1]
+    from mpl_toolkits.mplot3d import Axes3D
+
     fig = plt.figure()
-    #...
+    ax = fig.add_subplot(111, projection="3d")
+    ax.scatter(points[:, 0], points[:, 1], points[:, 2], c="black", s=0.5)
+    fig.show()
 
 def load_data(img1_path, img2_path, matches_path, camera1_path, camera2_path):
     img1 = cv2.imread(img1_path)
@@ -56,7 +50,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     img1, img2, matches, camera1, camera2 = load_data(args.img1, args.img2, args.matches, args.camera1, args.camera2)
-    F = fit_fundamental(matches)
+    
+    matchpoints1 = np.array([x[:2] for x in matches])
+    matchpoints2 = np.array([x[2:] for x in matches])
+
+    F = FMatrix(matchpoints1, matchpoints2)
     print("Fundamental matrix:\n{}".format(F))
 
     points1 = np.concatenate((matches[:, :2], np.ones((matches.shape[0], 1))), axis=1)
@@ -66,4 +64,5 @@ if __name__ == "__main__":
     residual = sum(errors)
     print(residual)
 
-    world_points = triangulate(camera1, camera2, matches)
+    world_points = triangulate(matchpoints1, matchpoints2, camera1, camera2)
+    visualize_matches(world_points)
